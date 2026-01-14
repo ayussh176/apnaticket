@@ -54,7 +54,7 @@ APNATICKET is a full-stack FinTech + GovTech platform designed to eliminate agen
 
 ### Clone the repo:
 ```bash
-git clone https://github.com/your-username/apnaticket.git
+git clone https://github.com/ayussh176/apnaticket.git
 cd apnaticket
 
 cd client
