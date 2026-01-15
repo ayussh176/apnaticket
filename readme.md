@@ -13,7 +13,7 @@ APNATICKET is a full-stack FinTech + GovTech platform designed to eliminate agen
 - Secure file upload for PAN/Aadhaar image verification
 
 ### Backend
-- **Node.js + Express** (NestJS optional upgrade)
+- **Node.js + Express**
 - **PostgreSQL** with Prisma or Sequelize ORM
 - **JWT** for authentication
 - **Rate limiting** and abuse detection
