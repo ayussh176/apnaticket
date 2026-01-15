@@ -1,10 +1,30 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import './index.css';
+import App from './App.tsx';
+import Login from './pages/Login.tsx';
+import Dashboard from './pages/Dashboard';
+
+const isAuthenticated = () => {
+  return !!localStorage.getItem('token'); // true if token exists
+};
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <BrowserRouter>
+      <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      {/* if token exists then go to dashboard else go to login */}
+      {/* <Route
+          path="/"
+          element={isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />}
+        />    
+        <Route path="/dashboard" element={<Dashboard />} /> */}
+
+    </Routes>
+    </BrowserRouter>
+  </StrictMode>
+);
