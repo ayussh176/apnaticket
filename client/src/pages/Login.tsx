@@ -16,15 +16,22 @@ export default function Login() {
       email,
       password,
     });
+
+    // ✅ Store the token in localStorage here
     localStorage.setItem('token', res.data.token);
+
     setMsg('✅ Login successful');
+
+    // ✅ Redirect to dashboard after storing token
     setTimeout(() => {
-      navigate('/dashboard'); // go to homepage after login
+      navigate('/dashboard');
     }, 1000);
+
   } catch (err: any) {
     setMsg(err.response?.data?.msg || 'Login failed');
   }
 };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
@@ -53,6 +60,18 @@ export default function Login() {
         </button>
         {msg && <p className="text-sm text-center text-red-600">{msg}</p>}
       </form>
+      <div className="mt-4 text-center">
+  <p className="text-sm text-gray-400">
+    Don't have an account?{" "}
+    <button
+      onClick={() => navigate("/register")}
+      className="text-blue-500 hover:underline"
+    >
+      Register here
+    </button>
+  </p>
+</div>
     </div>
+    
   );
 }
