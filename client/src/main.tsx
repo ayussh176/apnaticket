@@ -10,7 +10,8 @@ import Register from './pages/Register.tsx';
 
 // Helper function to check if user is authenticated
 const isAuthenticated = () => {
-  return !!localStorage.getItem('token'); // Returns true if token exists
+  const token = localStorage.getItem('token');
+  return !!token; // Returns true if token exists
 };
 
 createRoot(document.getElementById('root')!).render(
@@ -45,14 +46,14 @@ createRoot(document.getElementById('root')!).render(
         <Route
           path="/dashboard"
           element={
-            isAuthenticated() ? <Dashboard /> : <Navigate to="/login" />
+            isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />
           }
         />
 
-        {/* Catch-all route - redirect unmatched paths to login */}
+        {/* Catch-all route - redirect unmatched paths to home */}
         <Route
           path="*"
-          element={<Navigate to="/" />}
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </BrowserRouter>

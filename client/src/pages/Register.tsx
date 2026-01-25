@@ -12,6 +12,7 @@ export default function Register() {
   });
   const [msg, setMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: any) => {
@@ -24,19 +25,30 @@ export default function Register() {
     e.preventDefault();
     setErrorMsg('');
     setMsg('');
+    setLoading(true);
 
     try {
       const res = await axios.post('http://localhost:5000/api/auth/register', form);
 
-      // Store token
+      console.log('Registration successful, token received:', res.data.token);
+
+      // Store token in localStorage
       localStorage.setItem('token', res.data.token);
 
-      // Show success message briefly then navigate
-      setMsg('Registration successful! Redirecting...');
+      // Verify token was stored
+      const storedToken = localStorage.getItem('token');
+      console.log('Token stored in localStorage:', !!storedToken);
+
+      // Show success message
+      setMsg('Registration successful! Redirecting to dashboard...');
+
+      // Use window.location for more reliable redirect
       setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
+        window.location.href = '/dashboard';
+      }, 500);
+
     } catch (err: any) {
+      setLoading(false);
       const errorMessage = err.response?.data?.msg || 'Registration failed';
       setErrorMsg(errorMessage);
       console.error('Registration error:', err);
@@ -59,6 +71,7 @@ export default function Register() {
             value={form.email}
             onChange={handleChange}
             required
+            disabled={loading}
           />
         </div>
 
@@ -73,6 +86,7 @@ export default function Register() {
             value={form.password}
             onChange={handleChange}
             required
+            disabled={loading}
           />
         </div>
 
@@ -84,6 +98,7 @@ export default function Register() {
             className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.role}
             onChange={handleChange}
+            disabled={loading}
           >
             <option value="major">Major (Adult)</option>
             <option value="minor">Minor (Child)</option>
@@ -103,6 +118,7 @@ export default function Register() {
             value={form.panOrAadhaar}
             onChange={handleChange}
             required
+            disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">
             {form.role === 'minor' 
@@ -122,6 +138,7 @@ export default function Register() {
               value={form.guardianPan}
               onChange={handleChange}
               required
+              disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
               Format: 5 letters, 7 digits, 1 letter
@@ -142,9 +159,10 @@ export default function Register() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400"
         >
-          Register
+          {loading ? 'Registering...' : 'Register'}
         </button>
 
         {/* Login Link */}

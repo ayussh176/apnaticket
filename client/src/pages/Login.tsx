@@ -6,69 +6,113 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-
   const handleLogin = async (e: any) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post('http://localhost:5000/api/auth/login', {
-      email,
-      password,
-    });
-    
-    // Store token immediately
-    localStorage.setItem('token', res.data.token);
-    
-    // Navigate immediately without setTimeout
-    navigate('/dashboard');
-    
-  } catch (err: any) {
-    setMsg(err.response?.data?.msg || 'Login failed');
-  }
-};
+    e.preventDefault();
+    setErrorMsg('');
+    setMsg('');
+    setLoading(true);
 
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password,
+      });
+
+      console.log('Login successful, token received:', res.data.token);
+
+      // Store token in localStorage
+      localStorage.setItem('token', res.data.token);
+      
+      // Verify token was stored
+      const storedToken = localStorage.getItem('token');
+      console.log('Token stored in localStorage:', !!storedToken);
+
+      // Show success message
+      setMsg('Login successful! Redirecting to dashboard...');
+
+      // Use window.location for more reliable redirect
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
+
+    } catch (err: any) {
+      setLoading(false);
+      const errorMessage = err.response?.data?.msg || 'Login failed';
+      setErrorMsg(errorMessage);
+      console.error('Login error:', err);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form className="space-y-4 w-72" onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border p-2 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border p-2 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form onSubmit={handleLogin} className="space-y-4 w-96 border p-8 rounded shadow-lg bg-white">
+        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <input
+            type="email"
+            placeholder="your@email.com"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMsg('');
+            }}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        {/* Password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Password</label>
+          <input
+            type="password"
+            placeholder="Enter password"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrorMsg('');
+            }}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        {/* Error Message */}
+        {errorMsg && (
+          <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{errorMsg}</p>
+        )}
+
+        {/* Success Message */}
+        {msg && (
+          <p className="text-sm text-green-600 bg-green-50 p-2 rounded">{msg}</p>
+        )}
+
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400"
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
-        {msg && <p className="text-sm text-center text-red-600">{msg}</p>}
+
+        {/* Register Link */}
+        <p className="text-sm text-center">
+          Don't have an account?{' '}
+          <a href="/register" className="text-blue-600 hover:underline">
+            Register here
+          </a>
+        </p>
       </form>
-      <div className="mt-4 text-center">
-  <p className="text-sm text-gray-400">
-    Don't have an account?{" "}
-    <button
-      onClick={() => navigate("/register")}
-      className="text-blue-500 hover:underline"
-    >
-      Register here
-    </button>
-  </p>
-</div>
     </div>
-    
   );
 }
