@@ -8,41 +8,53 @@ import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register.tsx';
 
+// Helper function to check if user is authenticated
 const isAuthenticated = () => {
-  return !!localStorage.getItem('token'); // true if token exists
+  return !!localStorage.getItem('token'); // Returns true if token exists
 };
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-      <Route
-        path="/"
-        element={
-          isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          isAuthenticated() ? <Navigate to="/dashboard" /> : <Register />
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated() ? <Dashboard /> : <Navigate to="/" />
-        }
-      />
-    </Routes>
-      {/* if token exists then go to dashboard else go to login */}
-      {/* <Route
+        {/* Root route - redirect to dashboard if logged in, else to login */}
+        <Route
           path="/"
-          element={isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />}
-        />    
-        <Route path="/dashboard" element={<Dashboard />} /> */}
+          element={
+            isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />
+          }
+        />
 
-    {/* </Routes> */}
+        {/* Login route - redirect to dashboard if already logged in */}
+        <Route
+          path="/login"
+          element={
+            isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />
+          }
+        />
+
+        {/* Register route - redirect to dashboard if already logged in */}
+        <Route
+          path="/register"
+          element={
+            isAuthenticated() ? <Navigate to="/dashboard" /> : <Register />
+          }
+        />
+
+        {/* Dashboard route - protected, redirect to login if not authenticated */}
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated() ? <Dashboard /> : <Navigate to="/login" />
+          }
+        />
+
+        {/* Catch-all route - redirect unmatched paths to login */}
+        <Route
+          path="*"
+          element={<Navigate to="/" />}
+        />
+      </Routes>
     </BrowserRouter>
   </StrictMode>
 );

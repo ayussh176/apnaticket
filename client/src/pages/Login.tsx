@@ -16,21 +16,18 @@ export default function Login() {
       email,
       password,
     });
-
-    // ✅ Store the token in localStorage here
+    
+    // Store token immediately
     localStorage.setItem('token', res.data.token);
-
-    setMsg('✅ Login successful');
-
-    // ✅ Redirect to dashboard after storing token
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1000);
-
+    
+    // Navigate immediately without setTimeout
+    navigate('/dashboard');
+    
   } catch (err: any) {
     setMsg(err.response?.data?.msg || 'Login failed');
   }
 };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
