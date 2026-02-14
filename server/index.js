@@ -8,6 +8,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+const bookingRoutes = require('./routes/book');
+app.use('/api/book', bookingRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on ${process.env.PORT}`);

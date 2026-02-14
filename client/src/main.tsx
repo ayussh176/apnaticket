@@ -7,54 +7,102 @@ import App from './App.tsx';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register.tsx';
+import Booking from './pages/Booking.tsx';
+import MyBookings from './pages/MyBookings.tsx';
 
-// Helper function to check if user is authenticated
-const isAuthenticated = () => {
+import Navbar from './components/Navbar.tsx';
+import { Toaster } from 'react-hot-toast';
+
+// Helper component for protected routes
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('token');
-  return !!token; // Returns true if token exists
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return (
+    <>
+      <Navbar />
+      <Toaster position="top-center" reverseOrder={false} />
+      {children}
+    </>
+  );
+};
+
+// Helper component for public routes (redirect to dashboard if logged in)
+const PublicRoute = ({ children }: { children: JSX.Element }) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
 };
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* Root route - redirect to dashboard if logged in, else to login */}
+        {/* Root route - redirect based on auth status */}
         <Route
           path="/"
           element={
-            isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />
+            <PublicRoute>
+              <Navigate to="/login" replace />
+            </PublicRoute>
           }
         />
 
-        {/* Login route - redirect to dashboard if already logged in */}
+        {/* Login route - public, redirects to dashboard if logged in */}
         <Route
           path="/login"
           element={
-            isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
           }
         />
 
-        {/* Register route - redirect to dashboard if already logged in */}
+        {/* Register route - public, redirects to dashboard if logged in */}
         <Route
           path="/register"
           element={
-            isAuthenticated() ? <Navigate to="/dashboard" /> : <Register />
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
           }
         />
 
-        {/* Dashboard route - protected, redirect to login if not authenticated */}
+        {/* Dashboard route - protected */}
         <Route
           path="/dashboard"
           element={
-            isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
           }
         />
 
-        {/* Catch-all route - redirect unmatched paths to home */}
+        {/* Booking route - protected */}
         <Route
-          path="*"
-          element={<Navigate to="/" replace />}
+          path="/book"
+          element={
+            <ProtectedRoute>
+              <Booking />
+            </ProtectedRoute>
+          }
         />
+
+        {/* My Bookings route - protected */}
+        <Route
+          path="/my-bookings"
+          element={
+            <ProtectedRoute>
+              <MyBookings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all route - redirect to home (which handles auth redirect) */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
