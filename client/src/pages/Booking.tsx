@@ -11,18 +11,24 @@ export default function Booking() {
         journeyDate: '',
         passengerName: '',
         panOrAadhaar: '',
+        role: 'major', // 'major' or 'minor'
+        guardianPan: '',
     });
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e: any) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (checked ? 'minor' : 'major') : value
+        }));
     };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setLoading(true);
         const token = localStorage.getItem('token');
-        const processingToast = toast.loading('Confirming your booking...');
+        const processingToast = toast.loading('Verifying ID and checking wallet...');
 
         try {
             await axios.post('http://localhost:5000/api/book', form, {
@@ -31,15 +37,15 @@ export default function Booking() {
                 },
             });
 
-            // Simulate a short delay for better UX
             setTimeout(() => {
                 toast.dismiss(processingToast);
-                toast.success('Booking confirmed successfully!', { duration: 4000 });
+                toast.success('Booking confirmed! ₹50 deducted.', { duration: 4000 });
                 navigate('/my-bookings');
             }, 800);
         } catch (err: any) {
             toast.dismiss(processingToast);
-            toast.error(err.response?.data?.msg || 'Booking failed. Please try again.');
+            const errorMsg = err.response?.data?.msg || 'Booking failed. Please try again.';
+            toast.error(errorMsg);
             setLoading(false);
         }
     };
@@ -65,13 +71,13 @@ export default function Booking() {
                         Book Your Ticket
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Start your journey with us today.
+                        ₹50 will be deducted from your wallet.
                     </p>
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div className="mb-4">
+                    <div className="rounded-md shadow-sm space-y-4">
+                        <div>
                             <label htmlFor="bookingType" className="block text-sm font-medium text-gray-700 mb-1">Booking Type</label>
                             <select
                                 name="bookingType"
@@ -85,7 +91,7 @@ export default function Booking() {
                                 <option value="event">Event</option>
                             </select>
                         </div>
-                        <div className="mb-4">
+                        <div>
                             <label htmlFor="journeyDate" className="block text-sm font-medium text-gray-700 mb-1">Journey Date</label>
                             <input
                                 id="journeyDate"
@@ -97,7 +103,7 @@ export default function Booking() {
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div>
                             <label htmlFor="passengerName" className="block text-sm font-medium text-gray-700 mb-1">Passenger Name</label>
                             <input
                                 id="passengerName"
@@ -110,19 +116,53 @@ export default function Booking() {
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="mb-4">
-                            <label htmlFor="panOrAadhaar" className="block text-sm font-medium text-gray-700 mb-1">PAN / Aadhaar Number</label>
+
+                        <div className="flex items-center">
+                            <input
+                                id="role"
+                                name="role"
+                                type="checkbox"
+                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                checked={form.role === 'minor'}
+                                onChange={handleChange}
+                            />
+                            <label htmlFor="role" className="ml-2 block text-sm text-gray-900">
+                                I am under 18 (Minor)
+                            </label>
+                        </div>
+
+                        <div>
+                            <label htmlFor="panOrAadhaar" className="block text-sm font-medium text-gray-700 mb-1">
+                                {form.role === 'minor' ? 'Aadhaar Number (12 digits)' : 'PAN Number (10 chars)'}
+                            </label>
                             <input
                                 id="panOrAadhaar"
                                 name="panOrAadhaar"
                                 type="text"
                                 required
                                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="ABCD1234E"
+                                placeholder={form.role === 'minor' ? '123456789012' : 'ABCDE1234F'}
                                 value={form.panOrAadhaar}
                                 onChange={handleChange}
                             />
                         </div>
+
+                        {form.role === 'minor' && (
+                            <div>
+                                <label htmlFor="guardianPan" className="block text-sm font-medium text-gray-700 mb-1">Guardian PAN</label>
+                                <input
+                                    id="guardianPan"
+                                    name="guardianPan"
+                                    type="text"
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                    placeholder="Guardian's PAN"
+                                    value={form.guardianPan}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        )}
+
                     </div>
 
                     <div>

@@ -1,23 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middleware/authMiddleware');
-const bookings = require('../models/booking');
+const validateBooking = require('../middleware/validateBooking'); // Rate limiter
+const bookings = require('../models/booking'); // Fixed import
+const wallet = require('../models/wallet');
+const crypto = require('crypto');
 
-// GET all bookings for the logged-in user
-router.get('/', verifyToken, (req, res) => {
-    const userBookings = bookings.filter(b => b.userEmail === req.user.email);
-    res.json({ bookings: userBookings });
-});
+// POST /api/book - Create a new booking
+router.post('/', verifyToken, validateBooking, (req, res) => {
+    const { bookingType, journeyDate, passengerName, panOrAadhaar, role, guardianPan } = req.body;
 
-// POST a new booking
-router.post('/', verifyToken, (req, res) => {
-    const { bookingType, journeyDate, passengerName, panOrAadhaar } = req.body;
-
-    if (!bookingType || !journeyDate || !passengerName || !panOrAadhaar) {
-        return res.status(400).json({ msg: 'All fields are required' });
+    // 1. Validate ID based on role
+    if (role !== 'minor') {
+        // Major or undefined role -> Expect Valid PAN
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(panOrAadhaar)) {
+            return res.status(400).json({ msg: '❌ Invalid PAN format' });
+        }
+    } else {
+        // Minor -> Expect Aadhaar + Guardian PAN
+        if (!/^\d{12}$/.test(panOrAadhaar)) {
+            return res.status(400).json({ msg: '❌ Invalid Aadhaar number' });
+        }
+        if (!guardianPan || !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(guardianPan)) {
+            return res.status(400).json({ msg: '❌ Guardian PAN is required and must be valid' });
+        }
     }
 
-    // Check active booking limit
+    // 2. Booking Limit Check
     const userActiveBookings = bookings.filter(
         b => b.userEmail === req.user.email && b.status === 'confirmed'
     );
@@ -26,18 +35,65 @@ router.post('/', verifyToken, (req, res) => {
         return res.status(403).json({ msg: 'Booking limit reached (2 per user)' });
     }
 
+    // 3. Wallet Check & Deduction
+    if (!wallet[req.user.email]) {
+        wallet[req.user.email] = 0;
+    }
+
+    if (wallet[req.user.email] < 50) {
+        return res.status(402).json({ msg: '❌ Insufficient balance in E-Rupee wallet' });
+    }
+
+    wallet[req.user.email] -= 50; // Deduct amount
+
+    // 4. Create Booking
     const newBooking = {
+        id: crypto.randomUUID(),
         userEmail: req.user.email,
         bookingType,
         journeyDate,
         passengerName,
         panOrAadhaar,
+        guardianPan: role === 'minor' ? guardianPan : null,
         status: 'confirmed',
+        idVerified: true,
         createdAt: new Date(),
     };
 
-    bookings.push(newBooking); // Simulating DB save
-    res.status(201).json({ msg: 'Booking confirmed', booking: newBooking });
+    bookings.push(newBooking);
+    res.json({ msg: '✅ Booking confirmed! ₹50 deducted.', booking: newBooking });
+});
+
+// GET /api/book - Get user bookings
+router.get('/', verifyToken, (req, res) => {
+    const userBookings = bookings.filter(b => b.userEmail === req.user.email);
+    res.json({ bookings: userBookings });
+});
+
+// DELETE /api/book/:id - Cancel a booking
+router.delete('/:id', verifyToken, (req, res) => {
+    const { id } = req.params;
+    const bookingIndex = bookings.findIndex(b => b.id === id && b.userEmail === req.user.email);
+
+    if (bookingIndex === -1) {
+        return res.status(404).json({ msg: 'Booking not found' });
+    }
+
+    // Check if already cancelled
+    if (bookings[bookingIndex].status === 'cancelled') {
+        return res.status(400).json({ msg: 'Booking is already cancelled' });
+    }
+
+    // Update status
+    bookings[bookingIndex].status = 'cancelled';
+
+    // Refund 50%? Or full? Let's implement full refund for now as it's simpler to test.
+    // Requirement says "refund wallet? (Optional enhancement)". I'll adding 50 back.
+    if (wallet[req.user.email] !== undefined) {
+        wallet[req.user.email] += 50;
+    }
+
+    res.json({ msg: '❌ Booking cancelled. ₹50 refunded.', booking: bookings[bookingIndex] });
 });
 
 module.exports = router;

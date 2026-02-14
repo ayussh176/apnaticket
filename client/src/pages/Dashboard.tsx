@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({ email: '', role: '' });
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -22,7 +24,33 @@ export default function Dashboard() {
         localStorage.removeItem('token');
         navigate('/');
       });
+
+    // Fetch Wallet Balance
+    axios.get('http://localhost:5000/api/wallet/balance', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => setBalance(res.data.balance))
+      .catch(() => setBalance(0));
+
   }, []);
+
+  const handleRecharge = () => {
+    const token = localStorage.getItem('token');
+    const loadingToast = toast.loading('Adding funds...');
+
+    axios.post('http://localhost:5000/api/wallet/recharge', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => {
+        toast.dismiss(loadingToast);
+        toast.success(res.data.msg);
+        setBalance(res.data.balance);
+      })
+      .catch(() => {
+        toast.dismiss(loadingToast);
+        toast.error('Recharge failed');
+      });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -51,13 +79,29 @@ export default function Dashboard() {
       {/* Hero Section */}
       <motion.div variants={itemVariants} className="bg-indigo-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-            Welcome back, {userInfo.email ? userInfo.email.split('@')[0] : 'User'}!
-          </h1>
-          <p className="text-indigo-200 text-lg">
-            Manage your journeys and profile from here.
-            {userInfo.role && <span className="ml-2 bg-indigo-800 px-3 py-1 rounded-full text-xs uppercase tracking-wide">{userInfo.role}</span>}
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight mb-2">
+                Welcome back, {userInfo.email ? userInfo.email.split('@')[0] : 'User'}!
+              </h1>
+              <p className="text-indigo-200 text-lg">
+                Manage your journeys and profile from here.
+                {userInfo.role && <span className="ml-2 bg-indigo-800 px-3 py-1 rounded-full text-xs uppercase tracking-wide">{userInfo.role}</span>}
+              </p>
+            </div>
+
+            {/* Wallet Widget */}
+            <div className="bg-indigo-800 p-4 rounded-xl shadow-lg border border-indigo-600 text-center min-w-[150px]">
+              <p className="text-indigo-200 text-xs uppercase font-bold tracking-wider mb-1">E-Rupee Balance</p>
+              <p className="text-3xl font-bold text-white mb-2">₹{balance}</p>
+              <button
+                onClick={handleRecharge}
+                className="text-xs bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full transition-colors"
+              >
+                + Recharge ₹100
+              </button>
+            </div>
+          </div>
         </div>
       </motion.div>
 
