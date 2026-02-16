@@ -61,6 +61,11 @@ router.post('/', verifyToken, validateBooking, (req, res) => {
     };
 
     bookings.push(newBooking);
+
+    // Audit Log
+    const { logAction } = require('../models/auditLogs');
+    logAction(req.user.email, 'BOOKING_CREATED', { bookingId: newBooking.id, amount: 50, ip: req.ip });
+
     res.json({ msg: '✅ Booking confirmed! ₹50 deducted.', booking: newBooking });
 });
 
@@ -92,6 +97,10 @@ router.delete('/:id', verifyToken, (req, res) => {
     if (wallet[req.user.email] !== undefined) {
         wallet[req.user.email] += 50;
     }
+
+    // Audit Log
+    const { logAction } = require('../models/auditLogs');
+    logAction(req.user.email, 'BOOKING_CANCELLED', { bookingId: id, refund: 50, ip: req.ip });
 
     res.json({ msg: '❌ Booking cancelled. ₹50 refunded.', booking: bookings[bookingIndex] });
 });
