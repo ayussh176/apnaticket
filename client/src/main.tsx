@@ -3,15 +3,33 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import './index.css';
-import App from './App.tsx';
+import './index.css';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register.tsx';
 import Booking from './pages/Booking.tsx';
 import MyBookings from './pages/MyBookings.tsx';
+import AdminPanel from './pages/AdminPanel.tsx';
 
 import Navbar from './components/Navbar.tsx';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
+import axios from 'axios';
+
+// Setup Axios Interceptor
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem('token');
+      // Only redirect if not already on login/home
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+        toast.error('Session expired. Please login again.');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Helper component for protected routes
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -97,6 +115,16 @@ createRoot(document.getElementById('root')!).render(
           element={
             <ProtectedRoute>
               <MyBookings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin route - protected */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
             </ProtectedRoute>
           }
         />

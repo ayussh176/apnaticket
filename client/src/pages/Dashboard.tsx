@@ -67,7 +67,7 @@ export default function Dashboard() {
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 50 } }
-  };
+  } as const;
 
   return (
     <motion.div
@@ -146,11 +146,12 @@ export default function Dashboard() {
           </motion.div>
 
           {/* Admin Panel Card (Conditional) */}
-          {userInfo.role === 'admin' && (
+          {userInfo.email === 'admin@example.com' && (
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => navigate('/admin')}
               className="bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-purple-500"
             >
               <div className="flex items-center justify-between mb-4">

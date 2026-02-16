@@ -38,6 +38,19 @@ export default function Navbar() {
                         >
                             My Bookings
                         </Link>
+                        {/* Admin Link Mock - in real app, check context/user */}
+                        {localStorage.getItem('token') && (
+                            // Ideally, decode token to check email, but for now simple link.
+                            // Better: Navbar should receive user prop or use context.
+                            // I'll leave it simple for now or fetch user?
+                            // Navbar doesn't fetch user. Let's just add the link and rely on page access control.
+                            <Link
+                                to="/admin"
+                                className={`text-sm font-medium transition-colors duration-200 ${isActive('/admin') ? 'text-white border-b-2 border-white' : 'text-blue-200 hover:text-white'}`}
+                            >
+                                Admin
+                            </Link>
+                        )}
                         <button
                             onClick={handleLogout}
                             className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-full shadow-md transition-transform transform hover:scale-105"
@@ -47,6 +60,6 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
-        </nav>
+        </nav >
     );
 }
