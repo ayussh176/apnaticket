@@ -61,6 +61,9 @@ const register = async (req, res) => {
     }
 
     verified = aadhaarValid && guardianPanValid;
+  } else if (role === 'admin') {
+    // Admin is verified by default for this mock (or check a secret key in real app)
+    verified = true;
   }
 
   // Hash password

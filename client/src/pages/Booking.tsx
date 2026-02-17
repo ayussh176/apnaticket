@@ -40,11 +40,22 @@ export default function Booking() {
             setTimeout(() => {
                 toast.dismiss(processingToast);
                 toast.success('Booking confirmed! ₹50 deducted.', { duration: 4000 });
-                navigate('/my-bookings');
+                navigate('/mybookings');
             }, 800);
         } catch (err: any) {
             toast.dismiss(processingToast);
-            const errorMsg = err.response?.data?.msg || 'Booking failed. Please try again.';
+            let errorMsg = 'Booking failed. Please try again.';
+
+            if (err.response) {
+                if (err.response.status === 402) {
+                    errorMsg = '❌ Insufficient wallet balance! Please recharge.';
+                } else if (err.response.status === 429) {
+                    errorMsg = '🚫 Booking limit reached (2 per user).';
+                } else {
+                    errorMsg = err.response.data?.msg || errorMsg;
+                }
+            }
+
             toast.error(errorMsg);
             setLoading(false);
         }

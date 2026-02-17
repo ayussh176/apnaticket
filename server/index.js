@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const securityMiddleware = require('./middleware/security');
+const { securityMiddleware } = require('./middleware/security');
 securityMiddleware(app);
 
 app.use('/api/auth', authRoutes);

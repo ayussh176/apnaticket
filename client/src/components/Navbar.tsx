@@ -33,8 +33,8 @@ export default function Navbar() {
                             Book Ticket
                         </Link>
                         <Link
-                            to="/my-bookings"
-                            className={`text-sm font-medium transition-colors duration-200 ${isActive('/my-bookings') ? 'text-white border-b-2 border-white' : 'text-blue-200 hover:text-white'}`}
+                            to="/mybookings"
+                            className={`text-sm font-medium transition-colors duration-200 ${isActive('/mybookings') ? 'text-white border-b-2 border-white' : 'text-blue-200 hover:text-white'}`}
                         >
                             My Bookings
                         </Link>

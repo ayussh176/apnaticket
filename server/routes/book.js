@@ -6,8 +6,10 @@ const bookings = require('../models/booking'); // Fixed import
 const wallet = require('../models/wallet');
 const crypto = require('crypto');
 
+const { bookingLimiter } = require('../middleware/security');
+
 // POST /api/book - Create a new booking
-router.post('/', verifyToken, validateBooking, (req, res) => {
+router.post('/', verifyToken, bookingLimiter, validateBooking, (req, res) => {
     const { bookingType, journeyDate, passengerName, panOrAadhaar, role, guardianPan } = req.body;
 
     // 1. Validate ID based on role
@@ -58,6 +60,7 @@ router.post('/', verifyToken, validateBooking, (req, res) => {
         status: 'confirmed',
         idVerified: true,
         createdAt: new Date(),
+        ip: req.ip // Store IP for admin audit
     };
 
     bookings.push(newBooking);
@@ -78,7 +81,13 @@ router.get('/', verifyToken, (req, res) => {
 // DELETE /api/book/:id - Cancel a booking
 router.delete('/:id', verifyToken, (req, res) => {
     const { id } = req.params;
-    const bookingIndex = bookings.findIndex(b => b.id === id && b.userEmail === req.user.email);
+
+    let bookingIndex;
+    if (req.user.role === 'admin') {
+        bookingIndex = bookings.findIndex(b => b.id === id);
+    } else {
+        bookingIndex = bookings.findIndex(b => b.id === id && b.userEmail === req.user.email);
+    }
 
     if (bookingIndex === -1) {
         return res.status(404).json({ msg: 'Booking not found' });

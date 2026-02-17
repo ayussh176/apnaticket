@@ -20,9 +20,12 @@ export default function Dashboard() {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then((res) => setUserInfo(res.data))
-      .catch(() => {
-        localStorage.removeItem('token');
-        navigate('/');
+      .catch((err) => {
+        // Only logout if 401/403
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          localStorage.removeItem('token');
+          navigate('/');
+        }
       });
 
     // Fetch Wallet Balance
@@ -96,9 +99,9 @@ export default function Dashboard() {
               <p className="text-3xl font-bold text-white mb-2">₹{balance}</p>
               <button
                 onClick={handleRecharge}
-                className="text-xs bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white p-2 rounded w-full mt-2 transition-colors"
               >
-                + Recharge ₹100
+                Recharge ₹100
               </button>
             </div>
           </div>
@@ -132,7 +135,7 @@ export default function Dashboard() {
             variants={itemVariants}
             whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => navigate('/my-bookings')}
+            onClick={() => navigate('/mybookings')}
             className="bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-green-500"
           >
             <div className="flex items-center justify-between mb-4">

@@ -1,1 +1,6 @@
 [2026-02-16T03:07:45.932Z] USER: user@example.com | ACTION: WALLET_RECHARGE | META: {"amount":100,"ip":"::1"}
+[2026-02-16T05:59:19.902Z] USER: user@example.com | ACTION: WALLET_RECHARGE | META: {"amount":100,"ip":"::1"}
+[2026-02-16T05:59:28.704Z] USER: user@example.com | ACTION: BOOKING_CREATED | META: {"bookingId":"a46924cc-f23b-4f54-8d83-c96e8a3e3c5d","amount":50,"ip":"::1"}
+[2026-02-16T05:59:38.376Z] USER: user@example.com | ACTION: BOOKING_CANCELLED | META: {"bookingId":"a46924cc-f23b-4f54-8d83-c96e8a3e3c5d","refund":50,"ip":"::1"}
+[2026-02-16T06:03:07.668Z] USER: user@example.com | ACTION: WALLET_RECHARGE | META: {"amount":100,"ip":"::1"}
+[2026-02-16T06:03:20.131Z] USER: user@example.com | ACTION: BOOKING_CREATED | META: {"bookingId":"996ff9bc-4cdc-4d20-8746-891e98b0e64a","amount":50,"ip":"::1"}

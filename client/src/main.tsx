@@ -111,7 +111,7 @@ createRoot(document.getElementById('root')!).render(
 
         {/* My Bookings route - protected */}
         <Route
-          path="/my-bookings"
+          path="/mybookings"
           element={
             <ProtectedRoute>
               <MyBookings />

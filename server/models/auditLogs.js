@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logFilePath = path.join(__dirname, '..', 'logs.txt');
+const logFilePath = path.join(__dirname, '..', 'logs', 'bookings.log');
 
 const logs = []; // Keep in-memory for admin dashboard
 
