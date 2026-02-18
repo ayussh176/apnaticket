@@ -1,8 +1,9 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import './index.css';
+
 import './index.css';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard';
@@ -32,7 +33,7 @@ axios.interceptors.response.use(
 );
 
 // Helper component for protected routes
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const token = localStorage.getItem('token');
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -47,7 +48,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 };
 
 // Helper component for public routes (redirect to dashboard if logged in)
-const PublicRoute = ({ children }: { children: JSX.Element }) => {
+const PublicRoute = ({ children }: { children: ReactNode }) => {
   const token = localStorage.getItem('token');
   if (token) {
     return <Navigate to="/dashboard" replace />;
@@ -57,6 +58,7 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Toaster position="top-center" reverseOrder={false} />
     <BrowserRouter>
       <Routes>
         {/* Root route - redirect based on auth status */}

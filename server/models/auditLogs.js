@@ -1,7 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-const logFilePath = path.join(__dirname, '..', 'logs', 'bookings.log');
+const logger = require('../utils/logger'); // Import logger
 
 const logs = []; // Keep in-memory for admin dashboard
 
@@ -12,12 +9,8 @@ const logAction = (user, action, metadata) => {
     // 1. Push to in-memory store (for Admin Dashboard)
     logs.push(logEntry);
 
-    // 2. Append to file (Persistent Log)
-    const fileLogEntry = `[${timestamp.toISOString()}] USER: ${user} | ACTION: ${action} | META: ${JSON.stringify(metadata)}\n`;
-
-    fs.appendFile(logFilePath, fileLogEntry, (err) => {
-        if (err) console.error('Failed to write to log file:', err);
-    });
+    // 2. Log to file using winston
+    logger.info(`USER: ${user} | ACTION: ${action}`, { meta: metadata });
 };
 
 module.exports = { logs, logAction };

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import Spinner from '../components/ui/Spinner';
+
 export default function Booking() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -31,7 +33,7 @@ export default function Booking() {
         const processingToast = toast.loading('Verifying ID and checking wallet...');
 
         try {
-            await axios.post('http://localhost:5000/api/book', form, {
+            await axios.post(`${import.meta.env.VITE_API_BASE}/api/book`, form, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -182,9 +184,9 @@ export default function Booking() {
                             whileTap={{ scale: 0.98 }}
                             type="submit"
                             disabled={loading}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200`}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 flex justify-center items-center`}
                         >
-                            {loading ? 'Processing...' : 'Confirm Booking'}
+                            {loading ? <Spinner size={24} /> : 'Confirm Booking'}
                         </motion.button>
                     </div>
                 </form>

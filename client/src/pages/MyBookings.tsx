@@ -21,7 +21,7 @@ export default function MyBookings() {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        axios.get('http://localhost:5000/api/book', {
+        axios.get(`${import.meta.env.VITE_API_BASE}/api/book`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => setBookings(res.data.bookings))
@@ -44,7 +44,7 @@ export default function MyBookings() {
         const toastId = toast.loading('Cancelling booking...');
 
         try {
-            const res = await axios.delete(`http://localhost:5000/api/book/${id}`, {
+            const res = await axios.delete(`${import.meta.env.VITE_API_BASE}/api/book/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success(res.data.msg, { id: toastId });
@@ -136,7 +136,7 @@ export default function MyBookings() {
                                                 {b.bookingType === 'railway' ? '🚂' : b.bookingType === 'metro' ? '🚇' : '🎫'}
                                             </div>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${b.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                                                    b.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                                                b.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
                                                 }`}>
                                                 {b.status.toUpperCase()}
                                             </span>

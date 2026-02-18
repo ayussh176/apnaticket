@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
+import Spinner from '../components/ui/Spinner';
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -13,7 +15,6 @@ export default function Register() {
   const [msg, setMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -26,21 +27,18 @@ export default function Register() {
     setErrorMsg('');
     setMsg('');
     setLoading(true);
+    const loadingToast = toast.loading('Creating account...');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', form);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/api/auth/register`, form);
 
       console.log('Registration successful, token received:', res.data.token);
 
       // Store token in localStorage
       localStorage.setItem('token', res.data.token);
 
-      // Verify token was stored
-      const storedToken = localStorage.getItem('token');
-      console.log('Token stored in localStorage:', !!storedToken);
-
-      // Show success message
-      setMsg('Registration successful! Redirecting to dashboard...');
+      toast.dismiss(loadingToast);
+      toast.success('Registration successful! Redirecting...');
 
       // Use window.location for more reliable redirect
       setTimeout(() => {
@@ -49,9 +47,10 @@ export default function Register() {
 
     } catch (err: any) {
       setLoading(false);
+      toast.dismiss(loadingToast);
       const errorMessage = err.response?.data?.msg || 'Registration failed';
       setErrorMsg(errorMessage);
-      console.error('Registration error:', err);
+      toast.error(errorMessage);
     }
   };
 
@@ -121,8 +120,8 @@ export default function Register() {
             disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {form.role === 'minor' 
-              ? 'Enter your 12-digit Aadhaar number' 
+            {form.role === 'minor'
+              ? 'Enter your 12-digit Aadhaar number'
               : 'Format: 5 letters, 7 digits, 1 letter (e.g., ABCDE1234567Z)'}
           </p>
         </div>
@@ -160,9 +159,9 @@ export default function Register() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400 flex justify-center items-center"
         >
-          {loading ? 'Registering...' : 'Register'}
+          {loading ? <Spinner size={20} /> : 'Register'}
         </button>
 
         {/* Login Link */}

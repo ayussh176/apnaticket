@@ -1,67 +1,72 @@
-# 🎫 APNATICKET – A Secure, Transparent, Agent-Free Booking Platform Using E-Rupee
+# APNATICKET 🎟️
 
-APNATICKET is a full-stack FinTech + GovTech platform designed to eliminate agent-driven ticket hoarding and black marketing. It uses identity-verified booking (PAN/Aadhaar), simulates CBDC (E-Rupee) wallet payments, enforces booking limits, and ensures full auditability of public ticketing services like railways, metros, and large events.
+ApnaTicket is a modern, full-stack ticketing platform designed for booking Railway, Metro, and Event tickets with a focus on ease of use and security.
 
----
+## 🚀 Features
 
-## 🧱 Tech Stack
+- **User Roles**: Separate flows for Majors, Minors (with Guardian validation), and Admins.
+- **Booking Engine**: Validates identity documents (PAN/Aadhaar) and enforces daily booking limits.
+- **E-Rupee Wallet**: Integrated wallet system for seamless payments and refunds.
+- **Dashboard**: Real-time overview of latest bookings and wallet balance.
+- **Security**: JWT Authentication, Role-Based Access Control (RBAC), and Audit Logging.
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **React + TypeScript** (via Vite)
-- **Tailwind CSS** for modern UI styling
-- **PostCSS + Autoprefixer**
-- Secure file upload for PAN/Aadhaar image verification
+- **Framework**: React (Vite)
+- **Styling**: Tailwind CSS, Framer Motion
+- **Icons**: Lucide React
+- **Notifications**: React Hot Toast
+- **State Management**: React Hooks
 
 ### Backend
-- **Node.js + Express**
-- **PostgreSQL** with Prisma or Sequelize ORM
-- **JWT** for authentication
-- **Rate limiting** and abuse detection
-- **AES-256 encryption** for sensitive data
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Authentication**: JSON Web Tokens (JWT), Bcrypt
+- **Logging**: Winston
 
-### Other
-- **E-Rupee Wallet (Simulated)** – user balance, traceable payments
-- **QR-code ticketing** with encrypted metadata
-- **Admin Dashboard** for monitoring & anomaly detection
-- **Immutable Logs** for audit compliance
+## ⚙️ Setup & Installation
 
----
+### Prerequisites
+- Node.js (v18+)
+- npm
 
-## 🔐 Key Features
-
-- PAN/Aadhaar-based user registration and login
-- One PAN = max 2 tickets per booking cycle
-- Identity-linked tickets (no anonymous bookings)
-- IP + UserID-based blocking for mass-booking attempts
-- E-Rupee wallet simulation — no UPI/cards allowed
-- Role-based access (User, Admin)
-- Admin can view all bookings, flag suspicious activity
-
----
-
-## 🏗️ Folder Structure
-
-- /client → React frontend (Vite)
-- /server → Express backend (Node.js)
-- /docs → Architecture, DB schema, flowcharts
-- /infra → Docker, CI/CD (AWS or Render)
-- /design → UI wireframes, admin panel sketches
-
-
----
-
-## 🚀 Getting Started (Dev)
-
-### Clone the repo:
-```bash
-git clone https://github.com/ayussh176/apnaticket.git
+### 1. Clone the Repository
+\`\`\`bash
+git clone https://github.com/your-repo/apnaticket.git
 cd apnaticket
+\`\`\`
 
-cd client
-npm install
-npm run dev
-
+### 2. Backend Setup
+\`\`\`bash
 cd server
 npm install
-npm run dev
+cp .env.example .env # Configure your PORT, JWT_SECRET, DB_URL
+npm start
+\`\`\`
 
+### 3. Frontend Setup
+\`\`\`bash
+cd client
+npm install
+# Update .env with VITE_API_BASE=http://localhost:5000
+npm run dev
+\`\`\`
+
+## 🧪 Testing Credentials
+
+| Role | Email | Password | valid ID |
+|------|-------|----------|----------|
+| **Major** | `user@example.com` | `password` | `ABCDE1234F` (PAN) |
+| **Minor** | `minor@example.com` | `password` | `123456789012` (Aadhaar) |
+| **Admin** | `admin@example.com` | `admin123` | N/A |
+
+## 🌐 Deployment
+
+- **Frontend**: Deployed on Vercel.
+- **Backend**: Deployed on Render/Railway.
+
+## 🛡️ Security Measures
+- **Rate Limiting**: Protects against brute-force attacks.
+- **Input Validation**: Strict regex checks for PAN and Aadhaar.
+- **Audit Logs**: Tracks all critical actions (Bookings, Cancellations, Recharges).

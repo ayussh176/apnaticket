@@ -40,10 +40,10 @@ export default function AdminPanel() {
 
             try {
                 const [bookingsRes, logsRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/admin/bookings', {
+                    axios.get(`${import.meta.env.VITE_API_BASE}/api/admin/bookings`, {
                         headers: { Authorization: `Bearer ${token}` }
                     }),
-                    axios.get('http://localhost:5000/api/admin/logs', {
+                    axios.get(`${import.meta.env.VITE_API_BASE}/api/admin/logs`, {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                 ]);
@@ -70,7 +70,7 @@ export default function AdminPanel() {
         if (!window.confirm('Are you sure you want to cancel this booking?')) return;
         const token = localStorage.getItem('token');
         try {
-            await axios.delete(`http://localhost:5000/api/book/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_BASE}/api/book/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('Booking cancelled by Admin');

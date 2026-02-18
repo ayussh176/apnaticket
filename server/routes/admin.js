@@ -6,13 +6,23 @@ const bookings = require('../models/booking');
 const { logs } = require('../models/auditLogs');
 
 // GET /api/admin/bookings - Get all bookings
-router.get('/bookings', verifyToken, isAdmin, (req, res) => {
-    res.json(bookings);
+// GET /api/admin/bookings - Get all bookings
+router.get('/bookings', verifyToken, isAdmin, (req, res, next) => {
+    try {
+        res.json(bookings);
+    } catch (err) {
+        next(err);
+    }
 });
 
 // GET /api/admin/logs - Get all audit logs
-router.get('/logs', verifyToken, isAdmin, (req, res) => {
-    res.json(logs);
+// GET /api/admin/logs - Get all audit logs
+router.get('/logs', verifyToken, isAdmin, (req, res, next) => {
+    try {
+        res.json(logs);
+    } catch (err) {
+        next(err);
+    }
 });
 
 module.exports = router;

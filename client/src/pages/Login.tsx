@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
+import Spinner from '../components/ui/Spinner';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -8,16 +10,16 @@ export default function Login() {
   const [msg, setMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setErrorMsg('');
     setMsg('');
     setLoading(true);
+    const loadingToast = toast.loading('Logging in...');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/api/auth/login`, {
         email,
         password,
       });
@@ -26,24 +28,20 @@ export default function Login() {
 
       // Store token in localStorage
       localStorage.setItem('token', res.data.token);
-      
-      // Verify token was stored
-      const storedToken = localStorage.getItem('token');
-      console.log('Token stored in localStorage:', !!storedToken);
 
-      // Show success message
-      setMsg('Login successful! Redirecting to dashboard...');
+      toast.dismiss(loadingToast);
+      toast.success('Login successful! Redirecting...');
 
-      // Use window.location for more reliable redirect
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 500);
 
     } catch (err: any) {
       setLoading(false);
+      toast.dismiss(loadingToast);
       const errorMessage = err.response?.data?.msg || 'Login failed';
       setErrorMsg(errorMessage);
-      console.error('Login error:', err);
+      toast.error(errorMessage);
     }
   };
 
@@ -100,9 +98,9 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-medium disabled:bg-gray-400 flex justify-center items-center"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? <Spinner size={20} /> : 'Login'}
         </button>
 
         {/* Register Link */}

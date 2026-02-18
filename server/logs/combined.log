@@ -1,0 +1,3 @@
+2026-02-18 17:10:53 info: USER: user@example.com | ACTION: WALLET_RECHARGE | {"amount":100,"ip":"::1"}
+2026-02-18 17:11:04 info: USER: user@example.com | ACTION: BOOKING_CREATED | {"bookingId":"59be8eba-54c8-4d03-baaf-31b88c42521e","amount":50,"ip":"::1"}
+2026-02-18 17:11:14 info: USER: user@example.com | ACTION: BOOKING_CANCELLED | {"bookingId":"59be8eba-54c8-4d03-baaf-31b88c42521e","refund":50,"ip":"::1"}

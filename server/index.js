@@ -18,6 +18,9 @@ app.use('/api/wallet', walletRoutes);
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on ${process.env.PORT}`);
 });
